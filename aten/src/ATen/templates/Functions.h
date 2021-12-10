@@ -10,6 +10,13 @@
   See NOTE: [Tensor vs. TensorBase]
 #endif
 
+#if defined(AT_PER_OPERATOR_HEADERS) && defined(TORCH_ASSERT_ONLY_METHOD_OPERATORS)
+#error This change adds a dependency on all pytorch operators, meaning the     \
+  file will need to be re-compiled every time an operator is changed or added. \
+  Consider including a specific operator from <ATen/ops/{my_operator}.h> and   \
+  see NOTE [TORCH_ASSERT_ONLY_METHOD_OPERATORS].
+#endif
+
 #include <ATen/Context.h>
 #include <ATen/DeviceGuard.h>
 #include <ATen/TensorUtils.h>
@@ -24,6 +31,34 @@
 #include <c10/util/Optional.h>
 
 ${static_dispatch_extra_headers}
+
+// NOTE: [TORCH_ASSERT_ONLY_METHOD_OPERATORS]
+//
+// In ATen, certain generated headers files include the definitions of
+// every single operator in PyTorch. Unfortunately this means every
+// time an operator signature is updated or changed in
+// native_functions.yaml, you (and every other PyTorch developer) need
+// to recompile every source file that includes any of these headers.
+//
+// To break up these header dependencies, and improve incremental
+// build times for all PyTorch developers. These headers are split
+// into per-operator headers in the `ATen/ops` folder. This limits
+// incremental builds to only changes to methods of `Tensor`, or files
+// that use the specific operator being changed. With `at::sum` as an
+// example, you should include
+//
+//   <ATen/core/sum.h>         // instead of ATen/Functions.h
+//   <ATen/core/sum_native.h>  // instead of ATen/NativeFunctions.h
+//   <ATen/core/sum_ops.h>     // instead of ATen/Operators.h
+//
+// However, even if you're careful to use this in your own code.
+// `Functions.h` might be included indirectly through another header
+// without you realising. To avoid this, you can add
+//
+// #define TORCH_ASSERT_ONLY_METHOD_OPERATORS
+//
+// to the top of your source file. This way any time the non-specific
+// headers are included, the compiler will error out.
 
 ${Functions_includes}
 
