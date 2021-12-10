@@ -47,9 +47,10 @@ ${static_dispatch_extra_headers}
 // that use the specific operator being changed. With `at::sum` as an
 // example, you should include
 //
-//   <ATen/core/sum.h>         // instead of ATen/Functions.h
-//   <ATen/core/sum_native.h>  // instead of ATen/NativeFunctions.h
-//   <ATen/core/sum_ops.h>     // instead of ATen/Operators.h
+//   <ATen/core/sum.h>               // instead of ATen/Functions.h
+//   <ATen/core/sum_native.h>        // instead of ATen/NativeFunctions.h
+//   <ATen/core/sum_ops.h>           // instead of ATen/Operators.h
+//   <ATen/core/sum_cpu_dispatch.h>  // instead of ATen/CPUFunctions.h
 //
 // However, even if you're careful to use this in your own code.
 // `Functions.h` might be included indirectly through another header
