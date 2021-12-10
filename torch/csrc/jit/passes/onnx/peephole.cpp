@@ -1,3 +1,4 @@
+#define TORCH_ASSERT_ONLY_METHOD_OPERATORS
 #include <torch/csrc/jit/passes/onnx/peephole.h>
 
 #include <c10/util/Exception.h>
@@ -5,6 +6,15 @@
 #include <torch/csrc/jit/jit_log.h>
 #include <torch/csrc/jit/passes/dead_code_elimination.h>
 #include <torch/csrc/jit/passes/onnx/helper.h>
+
+#include <ATen/ScalarOps.h>
+
+#ifndef AT_PER_OPERATOR_HEADERS
+#include <ATen/Functions.h>
+#else
+#include <ATen/ops/ones_like_native.h>
+#include <ATen/ops/full.h>
+#endif
 
 #include <c10/util/Optional.h>
 
